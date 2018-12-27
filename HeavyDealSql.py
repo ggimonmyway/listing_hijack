@@ -2,7 +2,7 @@ from pymongo import MongoClient
 conn = MongoClient('localhost', 27017)
 
 
-class DealSql(object):
+class HeavyDealSql(object):
     def __init__(self):
         self.db = conn.followsell
 
@@ -10,34 +10,34 @@ class DealSql(object):
     # more 为可输入参数 即寻找number 大于 more 的字典
     # more为0 则获取全部 more为1 则获取被跟卖的
     def get_all_asin_number(self, more=0):
-        eachAsinSaleNum = self.db.eachAsinSaleNum
-        asin_number_list = {each['asin']: each['number'] for each in eachAsinSaleNum.find({'number': {'$gt': more}})}
+        heavyAsinSaleNum = self.db.heavyAsinSaleNum
+        asin_number_list = {each['asin']: each['number'] for each in heavyAsinSaleNum.find({'number': {'$gt': more}})}
         return asin_number_list
 
     # 如果已发送名单里面的asin的number变成1 则又开始进行检测
     def get_has_post(self):
-        haspost = self.db.haspost
-        eachAsinSaleNum = self.db.eachAsinSaleNum
+        heavyhaspost = self.db.heavyhaspost
+        heavyAsinSaleNum = self.db.heavyAsinSaleNum
         try:
-            haspostlist = [i['asin'] for i in haspost.find()]
+            haspostlist = [i['asin'] for i in heavyhaspost.find()]
         except:
             haspostlist = []
         for asin in haspostlist:
-            if eachAsinSaleNum.find_one({'asin': asin})['number'] == 1:
-                haspost.remove({'asin': asin})
+            if heavyAsinSaleNum.find_one({'asin': asin})['number'] == 1:
+                heavyhaspost.remove({'asin': asin})
 
     # 输出还没发送的被跟卖的名单
     # sku中后面带g的为自己跟卖自己的，进行处理
     def output_asin(self):
-        haspost = self.db.haspost
-        asinDict = self.db.asin.find_one({'flag': 'zj'})['asin']
+        heavyhaspost = self.db.heavyhaspost
+        asinDict = self.db.heavyasin.find_one({'flag': 'zj'})['asin']
         isfollow_list = self.get_all_asin_number(1)
         poplist = []
         for each in isfollow_list:
-            if asinDict[each].split('-')[1] == 'g':
+            if asinDict[each].split('-')[-1] == 'g':
                 poplist.append(each)
         try:
-            haspostlist = [i['asin'] for i in haspost.find()]
+            haspostlist = [i['asin'] for i in heavyhaspost.find()]
         except:
             haspostlist = []
 
@@ -52,12 +52,12 @@ class DealSql(object):
     # 把asin和商家数对应的数据清除掉
     # 开始新一轮的爬取
     def del_each_asin_number(self):
-        eachAsinSaleNum = self.db.eachAsinSaleNum
-        eachAsinSaleNum.remove()
+        heavyAsinSaleNum = self.db.heavyAsinSaleNum
+        heavyAsinSaleNum.remove()
 
     # 在asin 发送过后 将其写入数据库
     def has_post_asin(self):
         has_post = self.output_asin()
-        haspost = self.db.haspost
+        heavyhaspost = self.db.heavyhaspost
         for asin in has_post:
-            haspost.insert({'asin': asin})
+            heavyhaspost.insert({'asin': asin})
