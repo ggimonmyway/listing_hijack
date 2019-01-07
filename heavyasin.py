@@ -14,10 +14,11 @@ if __name__ == '__main__':
         with open('heavyasin.txt', 'w') as f:
             f.write(text)
         deal.has_post_asin()    # 把发送的asin保存到数据库中
-        deal.del_each_asin_number()  # 删除掉全部爬取的数据 等待新一轮的爬取
+        # deal.del_each_asin_number()  # 删除掉全部爬取的数据 等待新一轮的爬取
         end = time.time()
         until_time = end-start
         print(until_time)
         print('\a')
+        break
         if until_time < 3600:
             time.sleep(3600 - until_time)
