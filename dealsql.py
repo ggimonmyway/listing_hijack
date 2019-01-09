@@ -34,7 +34,7 @@ class DealSql(object):
         isfollow_list = self.get_all_asin_number(1)
         poplist = []
         for each in isfollow_list:
-            if asinDict[each].split('-')[1] == 'g':
+            if asinDict[each].split('-')[-1] == 'g':
                 poplist.append(each)
         try:
             haspostlist = [i['asin'] for i in haspost.find()]

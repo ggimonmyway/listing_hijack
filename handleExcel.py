@@ -45,7 +45,5 @@ def makeHeavyAsin():
 
 
 if __name__ == '__main__':
-	"""
 	handleExcel('子ASIN-2018.12.26-Iris.xlsx')
-	"""
 	makeHeavyAsin()

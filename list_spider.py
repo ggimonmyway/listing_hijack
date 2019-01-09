@@ -4,6 +4,7 @@ from pymongo import MongoClient
 import random
 conn = MongoClient('localhost', 27017)
 db = conn.followsell
+requests.packages.urllib3.disable_warnings()
 
 
 class IsFollow(object):
@@ -33,7 +34,7 @@ class IsFollow(object):
     def get_html(self, url):
         try:
             headers = {'User-Agent': random.choice(self.user_agent)}
-            html = requests.get(url, headers=headers)
+            html = requests.get(url, headers=headers, verify=False)
             # html.encoding = html.apparent_encoding # 可以写 没必要 编码一样 不用变 降低很多速度
             return html.text
         except:

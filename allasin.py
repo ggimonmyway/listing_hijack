@@ -3,6 +3,7 @@ from list_spider import IsFollow
 import time
 
 if __name__ == '__main__':
+    # 三个小时循环一次
     while True:
         start = time.time()
         isf = IsFollow()
@@ -19,6 +20,5 @@ if __name__ == '__main__':
         until_time = end-start
         print(until_time)
         print('\a')
-        break
         if until_time < 10800:
             time.sleep(10800 - until_time)
