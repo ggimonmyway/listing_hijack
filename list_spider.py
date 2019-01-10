@@ -1,5 +1,5 @@
 import requests
-from bs4 import BeautifulSoup
+import re
 from pymongo import MongoClient
 import random
 conn = MongoClient('localhost', 27017)
@@ -16,9 +16,9 @@ class IsFollow(object):
         demo_url = 'https://www.amazon.com/dp/%s?ie=UTF8&th=1&psc=1'
         self.user_agent = [
             "Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; Win64; x64; Trident/5.0; .NET CLR 3.5.30729; .NET CLR 3.0.30729; .NET CLR 2.0.50727; Media Center PC 6.0)",
-            "Mozilla/5.0 (compatible; MSIE 8.0; Windows NT 6.0; Trident/4.0; WOW64; Trident/4.0; SLCC2; .NET CLR 2.0.50727; .NET CLR 3.5.30729; .NET CLR 3.0.30729; .NET CLR 1.0.3705; .NET CLR 1.1.4322)",
-            "Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.2pre) Gecko/20070215 K-Ninja/2.1.1",
-            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36"
+            #"Mozilla/5.0 (compatible; MSIE 8.0; Windows NT 6.0; Trident/4.0; WOW64; Trident/4.0; SLCC2; .NET CLR 2.0.50727; .NET CLR 3.5.30729; .NET CLR 3.0.30729; .NET CLR 1.0.3705; .NET CLR 1.1.4322)",
+            #"Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.2pre) Gecko/20070215 K-Ninja/2.1.1",
+            #"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36"
         ]
 
         self.all_asin_list = [i[0] for i in db.asin.find_one()['asin'].items()]
@@ -43,9 +43,7 @@ class IsFollow(object):
     # 或许正在销售此商品的卖家数
     def get_sale_number(self, url):
         html_text = self.get_html(url)
-        soup = BeautifulSoup(html_text, 'lxml')
-        text = soup.select('#olp-upd-new > span > a')[0].text
-        sale_number = text.split('(')[-1].split(')')[0]
+        sale_number = re.findall(r'\((.*?)\) from', html_text)[0]
         return sale_number
 
     # 将asin对应卖家数插入数据库
